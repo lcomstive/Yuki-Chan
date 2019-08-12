@@ -13,6 +13,8 @@ module.exports = class Roleplay extends Command
 		this.config.routesDir = this.config.routesDir || './config/dialogue_routes/'
 		if(!this.config.routesDir.endsWith('/'))
 			this.config.routesDir += '/'
+		if(!fs.existsSync(this.config.routesDir))
+			fs.mkdirSync(this.config.routesDir)
 
 		// 'user' object
 		// {

@@ -18,7 +18,7 @@ module.exports = class OwO extends Command
 				msg.channel.send(`You haven't OwO'd anywhere yet`)
 				return
 			}
-			msg.channel.send(`${msg.member ? msg.member.displayName : msg.author.username}${this.randomHonorific()}'s count is currently at ${this.config.users[msg.author.id].globalCount}`)
+			msg.channel.send(`${msg.member ? msg.member.displayName : msg.author.username}${this.randomHonorific()} has been a degenerate a total of ${this.config.users[msg.author.id].globalCount} time${this.config.users[msg.author.id].globalCount == 1 ? '' : 's'}`)
 		})
 		.add(/^owo/i, (params, msg) =>
 		{
@@ -34,7 +34,7 @@ module.exports = class OwO extends Command
 				msg.channel.send(`You haven't OwO'd on this server yet`)
 				return
 			}
-			msg.channel.send(`${msg.member ? msg.member.displayName : msg.author.username}${this.randomHonorific()}'s count is currently at ${user.guilds[guildID]}`)
+			msg.channel.send(`${msg.member ? msg.member.displayName : msg.author.username}${this.randomHonorific()} has been a degenerate ${user.guilds[guildID]} time${user.guilds[guildID] == 1 ? '' : 's'}`)
 		})
 		.add(/^help owo/i, (params, msg) => { msg.channel.send('`owo (global)`: Counts the amount of times you\'ve OwO\'d (*across all servers if `global`*)') })
 	}

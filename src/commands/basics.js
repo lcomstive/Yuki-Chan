@@ -23,8 +23,7 @@ module.exports = class BasicCommands extends Command
 												.addField('`flip (count)`', 'Flips between 1 and 6 coins (*default is 1*)')
 												.addField('`owo (global)`', 'Counts the amount of times you\'ve OwO\'d (*across all servers if `global`*)')
 												.addField('`shush|mute @user`', 'Mutes the given user')
-												// TODO: Re-do 'reaction add/remove'
-												// .addField('`react <reaction> (@user)`', 'Sends a reaction image (*e.g. hug, slap*)')
+												.addField('`react <reaction> (@user)`', 'Sends a reaction image (*e.g. hug, slap*)')
 												.addField('`roleplay|rp`', 'Initiates roleplay with Yuki-chan')
 												)
 			},

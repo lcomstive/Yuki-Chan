@@ -26,7 +26,7 @@ module.exports =
 	getGuild(msg) { return module.exports.commands[0].getGuild(msg) },
 	random(array) { return module.exports.commands[0].random(array) },
 	randomNotNSFW() { return module.exports.commands[0].randomNotNSFW() },
-	randomNotAdmin() { return module.exports.commands[0].randomNotNSFW() },
+	randomNotAdmin() { return module.exports.commands[0].randomNotAdmin() },
 	randomGuildsOnly() { return module.exports.commands[0].randomGuildsOnly() },
 	randomHonorific(connector = '-') { return module.exports.commands[0].randomHonorific(connector) },
 
@@ -112,10 +112,10 @@ module.exports.discordClient.on('ready', () =>
 
 checkGuildData = (cmd, guildID, message) =>
 {
-	let guilds = cmd ? cmd.config.guilds : undefined
-	guilds = guilds || {}
+	let guilds = (cmd ? cmd.config.guilds : undefined) || {}
 	guilds[guildID] = guilds[guildID] || {}
 	guilds[guildID].commandToken = guilds[guildID].commandToken || config.defaultCommandToken || '!'
+	cmd.config.guilds = cmd.config.guilds || {}
 
 	switch(message.channel.type)
 	{

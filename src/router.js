@@ -72,17 +72,17 @@ module.exports = class Router
 			{
 				match.shift()
 				let index = require('./index.js')
-				if(this.routes[i].options.adminRequired && !isAdmin)
+				if(this.routes[i].options.adminRequired == true && !isAdmin)
 				{
 					message.channel.send(index.randomNotAdmin())
 					return this
 				}
-				if(this.routes[i].options.nsfw && !index.isNSFW(message))
+				if(this.routes[i].options.nsfw == true && !index.isNSFW(message))
 				{
 					message.channel.send(index.randomNotNSFW())
 					return this
 				}
-				if(this.routes[i].options.guildsOnly && (message.channel.type == 'dm' || message.channel.type == 'group'))
+				if(this.routes[i].options.guildsOnly == true && (message.channel.type == 'dm' || message.channel.type == 'group'))
 				{
 					message.channel.send(index.randomGuildsOnly())
 					return this

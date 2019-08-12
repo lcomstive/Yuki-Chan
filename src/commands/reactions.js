@@ -4,6 +4,61 @@ const Command = require('./command.js')
 const Config = require('../config.js')
 const { RichEmbed } = require('discord.js')
 
+const DefaultReactions =
+{
+	hug: [
+		'https://i.imgur.com/r9aU2xv.gif',
+		'https://i.imgur.com/wOmoeF8.gif',
+		'https://i.imgur.com/v47M1S4.gif',
+		'https://i.imgur.com/4oLIrwj.gif',
+		'https://i.imgur.com/XEs1SWQ.gif',
+		'https://i.imgur.com/EatYxy1.gif',
+		'https://i.imgur.com/VgP2ONn.gif',
+		'https://i.imgur.com/34Ldmbz.gif',
+		'https://i.imgur.com/hA9ZNoR.gif',
+		'https://i.imgur.com/iKPs2AJ.gif',
+		'https://i.imgur.com/14FwOef.gif',
+		'https://i.imgur.com/hgDeZLg.gif',
+		'https://i.imgur.com/daowaXJ.gif'
+	],
+	slap: [
+		'https://i.imgur.com/fm49srQ.gif',
+		'https://i.imgur.com/4MQkDKm.gif',
+		'https://i.imgur.com/oOCq3Bt.gif',
+		'https://i.imgur.com/Agwwaj6.gif',
+		'https://i.imgur.com/YA7g7h7.gif',
+		'https://i.imgur.com/oRsaSyU.gif',
+		'https://i.imgur.com/kSLODXO.gif',
+		'https://i.imgur.com/CwbYjBX.gif'
+	],
+	pat: [
+		'https://i.imgur.com/2lacG7l.gif',
+		'https://i.imgur.com/UWbKpx8.gif',
+		'https://i.imgur.com/4ssddEQ.gif',
+		'https://i.imgur.com/2k0MFIr.gif',
+		'https://i.imgur.com/NNOz81F.gif',
+		'https://i.imgur.com/6mSpKwd.gif',
+		'https://i.imgur.com/sLwoifL.gif',
+		'https://i.imgur.com/hEo9s8l.gif'
+	],
+	dance: [
+		'https://i.imgur.com/w5AeGIz.gif',
+		'https://i.imgur.com/yVcciQK.gif',
+		'https://gfycat.com/fittingdizzyhornedviper',
+		'https://media1.tenor.com/images/aa9374ef547c871d4626a22d24042d1f/tenor.gif?itemid=10495378',
+		'https://media1.tenor.com/images/21e860a31f32d5e3e6bdf2963cadfebf/tenor.gif?itemid=5897404',
+		'https://media1.tenor.com/images/94e0a12faac0821738185def2d96a808/tenor.gif?itemid=7797151',
+		'https://media1.tenor.com/images/59cf8269123c2fb32eb00114d384cdd5/tenor.gif?itemid=12503868',
+		'https://media1.tenor.com/images/b013100cef1cde9158b0371fc1cf7489/tenor.gif?itemid=8074573',
+		'https://media1.tenor.com/images/ea99c7df73cf7e6c4e09a3b8993c7f1c/tenor.gif?itemid=4979462'
+	]
+}
+
+const DefaultFormats = {
+	dance: '$SENDER dances with $USER',
+	pat: '$SENDER pats $USER'
+}
+
 formatText = (text, reaction, sender, username) =>
 {
 	if(text == '<empty>') return undefined
@@ -19,12 +74,12 @@ module.exports = class Reactions extends Command
 	setup(router)
 	{
 		this.config = Config('reactions')
-		if(!this.config.hug)
-		{
-			this.config.slap = this.config.slap || []
-			this.config.hug  = this.config.hug  || []
-			this.config.save()
-		}
+
+		this.config.slap  = this.config.slap  || DefaultReactions.slap
+		this.config.hug   = this.config.hug   || DefaultReactions.hug
+		this.config.pat   = this.config.pat   || DefaultReactions.pat
+		this.config.dance = this.config.dance || DefaultReactions.dance
+		this.config.save()
 
 		// react list
 		// reaction list
@@ -34,6 +89,8 @@ module.exports = class Reactions extends Command
 			let listMsg = `Reactions:`
 			listMsg += '\n - hug'
 			listMsg += '\n - slap'
+			listMsg += '\n - pat'
+			listMsg += '\n - dance'
 
 			let guildID = this.getGuild(msg)
 			this.config.guilds = this.config.guilds || {}
@@ -102,7 +159,7 @@ module.exports = class Reactions extends Command
 			if(!this.config.guilds[guildID])
 				this.config.guilds[guildID] = {}
 			if(!this.config.guilds[guildID].formats)
-				this.config.guilds[guildID].formats = {}
+				this.config.guilds[guildID].formats = DefaultFormats
 			if(params[1].toLowerCase() == 'help')
 			{
 				let help = new RichEmbed()
@@ -247,7 +304,7 @@ module.exports = class Reactions extends Command
 		//		(current guild images are added if available)
 		// e.g. slap @Yuki-Chan
 		// e.g. hug
-		.add(/^(slap|hug)(.*)?/i, (params, message) =>
+		.add(/^(slap|hug|pat|dance)(.*)?/i, (params, message) =>
 		{
 			let mentions = params[1] && message.mentions.users.size > 0
 			let authorName = message.member ? message.member.displayName : message.author.username
@@ -257,6 +314,8 @@ module.exports = class Reactions extends Command
 				this.config.guilds = {}
 			if(!this.config.guilds[guildID])
 				this.config.data.guilds[guildID] = {}
+			if(!this.config.guilds[guildID].formats)
+				this.config.guilds[guildID].formats = DefaultFormats
 			if(mentions)
 				name = message.mentions.members ? message.mentions.members.first().displayName : message.mentions.users.first().username
 			else if(params[1])
@@ -298,6 +357,8 @@ module.exports = class Reactions extends Command
 				this.config.guilds = {}
 			if(!this.config.guilds[guildID])
 				this.config.guilds[guildID] = {}
+			if(!this.config.guilds[guildID].formats)
+				this.config.guilds[guildID].formats = DefaultFormats
 			if(!params[0])
 			{
 				msg.channel.send('Invalid reaction')
@@ -346,7 +407,7 @@ module.exports = class Reactions extends Command
 		.add(/^(help react)|((react|reaction) help)/i, (params, msg) =>
 		{
 			msg.channel.send('Reaction Commands', new RichEmbed()
-			.addField('`<slap|hug> (@user)`', 'Sends a random image from a list of available reactions (current guild images included)\n' +
+			.addField('`<slap|hug|pat|dance> (@user)`', 'Sends a random image from a list of available reactions (current guild images included)\n' +
 													  '(*.e.g* `slap @Yuki-Chan`, `hug`)')
 			.addBlankField()
 			.addField('`react <reaction> (@user)`', 'Sends a random image from a list of available reactions in the current guild\n' +
