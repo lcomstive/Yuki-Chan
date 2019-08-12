@@ -26,11 +26,32 @@ module.exports = class Reactions extends Command
 			this.config.save()
 		}
 
+		// react list
+		// reaction list
+		//		Lists all available reactions
+		router.add(/^(reaction|react) list/i, (params, msg) =>
+		{
+			let listMsg = `Reactions:`
+			listMsg += '\n - hug'
+			listMsg += '\n - slap'
+
+			let guildID = this.getGuild(msg)
+			this.config.guilds = this.config.guilds || {}
+			if(this.config.guilds[guildID])
+				for(const [key, val] of Object.entries(this.config.guilds[guildID]))
+				{
+					if(key == 'formats' || key == 'colours' || key == 'hug' || key == 'slap')
+						continue
+					listMsg += `\n - ${key}`
+				}
+
+			msg.channel.send(listMsg)
+		})
 		// reaction list <reaction>
 		// react list <reaction>
 		//		Lists all images in the current guild for the given reaction
 		// e.g. reaction list hug
-		router.add(/^(reaction|react) list (\w+)/i, (params, msg) =>
+		.add(/^(reaction|react) list (\w+)/i, (params, msg) =>
 		{
 			params.splice(0, 1)
 			let guildID = this.getGuild(msg)
@@ -112,7 +133,7 @@ module.exports = class Reactions extends Command
 			this.config.guilds[guildID].formats[params[1].toLowerCase()] = format
 			this.config.save()
 			msg.channel.send(`Set format of '*${params[1]}*' to \`${format}\``)
-		})
+		}, { adminRequired: true })
 		// reaction color|colour <reaction> <colour>
 		//		Sets the embed colour for the given reaction in the current guild
 		//		Reaction can be any tag (reaction) or 'default'
@@ -133,11 +154,11 @@ module.exports = class Reactions extends Command
 				this.config.guilds[guildID].colours = {}
 			this.config.guilds[guildID].colours[params[1].toLowerCase()] = params[2].toUpperCase()
 			msg.channel.send(`Set colour of '${params[1].toLowerCase()}' to '${params[2].toUpperCase()}'`)
-		})
+		}, { adminRequired: true })
 		// reaction <add|remove> <reaction> <url>
 		//		Adds or removes an image (url) with the given tag (reaction) for the current guild
 		//		Removal can either be a URL or index
-		// e.g. reaction add hug https://i.imgur.com/QJbBsDJ.gif
+		// e.g. react add hug https://i.imgur.com/QJbBsDJ.gif
 		// e.g. reaction remove hug 2
 		.add(/^(reaction|react) (add|remove) (\w+) (.*)/i, (params, msg) =>
 		{
@@ -220,7 +241,7 @@ module.exports = class Reactions extends Command
 					this.config.save()
 				}
 			}
-		})
+		}, { adminRequired: true })
 		// slap|hug (@user)
 		//		Sends a random image from an array for the given reaction
 		//		(current guild images are added if available)
@@ -235,7 +256,7 @@ module.exports = class Reactions extends Command
 			if(!this.config.guilds)
 				this.config.guilds = {}
 			if(!this.config.guilds[guildID])
-				this.confolig.data.guilds[guildID] = {}
+				this.config.data.guilds[guildID] = {}
 			if(mentions)
 				name = message.mentions.members ? message.mentions.members.first().displayName : message.mentions.users.first().username
 			else if(params[1])
@@ -343,7 +364,7 @@ module.exports = class Reactions extends Command
 			.addBlankField()
 			.addField('`reaction <add|remove> <reaction> <url>`', 'Adds or removes an image (url) with the given tag (reaction) for the current guild\n' +
 																		  'Removal can either be a URL or index\n' +
-																	  	  '(*.e.g* `reaction remove hug https://i.imgur.com/QJbBsDJ.gif`, `reaction remove slap 2`)')
+																	  	  '(*e.g.* `reaction remove hug https://i.imgur.com/QJbBsDJ.gif`, `reaction remove slap 2`)')
 			)
 		})
 		.add(/^(react|reaction)/i, (params, msg) => { msg.channel.send('Unknown command, see `react help` for available commands') })

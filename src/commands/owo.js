@@ -36,6 +36,7 @@ module.exports = class OwO extends Command
 			}
 			msg.channel.send(`${msg.member ? msg.member.displayName : msg.author.username}${this.randomHonorific()}'s count is currently at ${user.guilds[guildID]}`)
 		})
+		.add(/^help owo/i, (params, msg) => { msg.channel.send('`owo (global)`: Counts the amount of times you\'ve OwO\'d (*across all servers if `global`*)') })
 	}
 
 	onMessage(message, isCommand)

@@ -1,11 +1,20 @@
 const Command = require('./command.js')
+const { RichEmbed } = require('discord.js')
 
 module.exports = class Avatar extends Command
 {
 	setup(router)
 	{
+		// 'help avatar', 'avatar help'
+		router.add(/^(help avatar)|(avatar help)/i, (params, message) =>
+		{
+			message.channel.send('Avatar Help', new RichEmbed()
+				.addField('`avatar (@user)`', 'Obtains the image for the mentioned user (*or the sender if none given*)')
+			)
+		})
+
 		// avatar @<MENTIONED_USER>
-		router.add(/^avatar @(.*)/i, (params, message) =>
+		.add(/^avatar @(.*)/i, (params, message) =>
 		{
 			try
 			{
@@ -42,14 +51,6 @@ module.exports = class Avatar extends Command
 				console.log(`Failed to find '${params[0]}' - ${e}`)
 				message.channel.send(`Couldn't find '${params[0]}', where could they be?`)
 			}
-		})
-
-		// 'help avatar', 'avatar help'
-		.add(/^(help avatar)|(avatar help)/i, (params, message) =>
-		{
-			message.channel.send('Avatar Help', new RichEmbed()
-			.addField('`avatar (@user)`', 'Obtains the image for the mentioned user (*or the sender if none given*)')
-			)
 		})
 
 		// avatar

@@ -18,10 +18,14 @@ module.exports = class BasicCommands extends Command
 				emoji: '🎉',
 				callback: (msg, emoji) => msg.channel.send(new RichEmbed()
 												.setDescription(`**Yuki-Chan Misc. Commands**`)
-												.addField('`avatar (@user)`', 'Obtains the avatar of the user mentioned (*or sender if none*)').addBlankField()
-												.addField('`exp (@user)`', 'Shows the level and experience of the user mentioned (*or sender if none*)').addBlankField()
-												.addField('`flip (count)`', 'Flips between 1 and 6 coins (*default is 1*)').addBlankField()
+												.addField('`avatar (@user)`', 'Obtains the avatar of the user mentioned (*or sender if none*)')
+												.addField('`exp (@user)`', 'Shows the level and experience of the user mentioned (*or sender if none*)')
+												.addField('`flip (count)`', 'Flips between 1 and 6 coins (*default is 1*)')
 												.addField('`owo (global)`', 'Counts the amount of times you\'ve OwO\'d (*across all servers if `global`*)')
+												.addField('`shush|mute @user`', 'Mutes the given user')
+												// TODO: Re-do 'reaction add/remove'
+												// .addField('`react <reaction> (@user)`', 'Sends a reaction image (*e.g. hug, slap*)')
+												.addField('`roleplay|rp`', 'Initiates roleplay with Yuki-chan')
 												)
 			},
 			{
@@ -164,6 +168,7 @@ module.exports = class BasicCommands extends Command
 			this.sendDialogueOptions(msg,
 					`Yuki-Chan Commands: (Token: \`${this.config.guilds[this.getGuild(msg)].commandToken || '!'}\`)`,
 					this.commandPages,
+					undefined,
 					undefined,
 					' $EMOJI$ for *$OPTION$*',
 					undefined,

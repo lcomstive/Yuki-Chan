@@ -10,22 +10,12 @@ module.exports = class Experience extends Command
 		this.config.users = this.config.users || {}
 		this.config.commandEXP = this.config.commandEXP || false
 		this.config.messageCooldown = this.config.messageCooldown == undefined ? this.config.messageCooldown : 0 // In seconds, 2 minutes by default
-		// exp global
-		//		Shows the amount of experience the sender has globally
-		router.add(/exp global/i, (params, msg) =>
-		{
-			if(!this.config.users[msg.author.id])
-			{
-				msg.channel.send(`You haven't spoken anywhere yet..`)
-				return
-			}
-			msg.channel.send(`${msg.member.displayName}${this.randomHonorific()} has ${this.config.users[msg.author.id] ? this.config.users[msg.author.id].globalCount : 0} total EXP`)
-		}, { guildsOnly: true })
+
 		// exp (global) @user
 		//		Shows the amount of experience the user has (total if 'global')
 		// e.g. exp @Yuki-Chan
 		// e.g. exp global @Yuki-Chan
-		.add(/^exp (global )?@(.*)/i, (params, msg) =>
+		router.add(/^exp (global )?@(.*)/i, (params, msg) =>
 		{
 			let global = params[0] && params[0].toLowerCase().includes('global')
 			let discordUser = msg.mentions.users.first()
@@ -46,6 +36,17 @@ module.exports = class Experience extends Command
 				msg.channel.send(`${username}${this.randomHonorific()} has ${user.guilds[guildID].exp || 0} EXP and is level ${user.guilds[guildID].lvl || 0}`)
 			else
 				msg.channel.send(`${username}${this.randomHonorific()} has ${user.globalCount || 0} total EXP`)
+		}, { guildsOnly: true })
+		// exp global
+		//		Shows the amount of experience the sender has globally
+		.add(/exp global/i, (params, msg) =>
+		{
+			if(!this.config.users[msg.author.id])
+			{
+				msg.channel.send(`You haven't spoken anywhere yet..`)
+				return
+			}
+			msg.channel.send(`${msg.member.displayName}${this.randomHonorific()} has ${this.config.users[msg.author.id] ? this.config.users[msg.author.id].globalCount : 0} total EXP`)
 		}, { guildsOnly: true })
 		// exp (global) <username>
 		//		Shows the amount of experience the user has (total if 'global')
@@ -84,7 +85,7 @@ module.exports = class Experience extends Command
 		.add(/^(help exp)|(exp help)/i, (params, msg) =>
 		{
 			msg.channel.send('Experience Help', new RichEmbed()
-			.addField('Experience Distribution', '10-30 experience is randomly generated and given for each message sent, with a ${this.config.messageCooldown} second cooldown\n' +
+			.addField('Experience Distribution', `10-30 experience is randomly generated and given for each message sent, with a ${this.config.messageCooldown} second cooldown\n` +
 												 'Experience and levels are per-server, but overall experience can be shown with `exp global`')
 			.addBlankField()
 			.addField('`exp (global) (@user)`', 'Shows the level and experience of the user mentioned (*or sender if none given*) (*overall experience if `global`*)')
