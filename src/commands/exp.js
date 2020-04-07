@@ -126,13 +126,14 @@ module.exports = class Experience extends Command
 			user.guilds = {}
 		if(user.guilds[guildID] && user.guilds[guildID].lastMessage && this.config.messageCooldown && (Date.now() - new Date(user.guilds[guildID].lastMessage)) / 1000 < this.config.messageCooldown)
 			return // cooldown is still in effect
+		user.guilds[guildID].lastMessage = Date.now()
 
 		// Update the total count
 		user.globalCount = (user.globalCount || 0) + count
 		// Update the count for the current channel
 		if(!user.guilds[guildID])
 			user.guilds[guildID] = {}
-		user.guilds[guildID].exp = (user.guilds[guildID] ? user.guilds[guildID].exp || 0 : 0) + count
+		user.guilds[guildID].exp = (user.guilds[guildID] ? (user.guilds[guildID].exp || 0) : 0) + count
 
 		// Generate points (10-50)
 		let cards = require('../index.js').getCommand('cards')
@@ -144,9 +145,9 @@ module.exports = class Experience extends Command
 		else
 			console.log('Couldn\'t find Cards command')
 
-		if(user.guilds[guildID].exp >= ((user.guilds[guildID].lvl || 0) + 1) * 200)
+		if(user.guilds[guildID].exp >= ((user.guilds[guildID].lvl || 1) + 1) * 200)
 		{
-			user.guilds[guildID].lvl = (user.guilds[guildID].lvl || 0) + 1
+			user.guilds[guildID].lvl = (user.guilds[guildID].lvl || 1) + 1
 			message.channel.send(new RichEmbed()
 				.setTitle('Level Up!')
 				.setDescription(`${message.member ? message.member.displayName : message.author.username}${this.randomHonorific()} leveled up to **level ${user.guilds[guildID].lvl}**`)
@@ -155,7 +156,7 @@ module.exports = class Experience extends Command
 				)
 		}
 
-		user.guilds[guildID].lastMessage = Date.now()
+		// user.guilds[guildID].lastMessage = Date.now()
 
 		this.config.users[message.author.id] = user
 		this.config.save()

@@ -1,4 +1,5 @@
 const Debug = require('../debug.js')
+const Random = require('../random.js')
 const { RichEmbed } = require('discord.js')
 
 const DefaultDialogueFormat 	  = '$CONTENT$\n$OPTIONS$'
@@ -117,7 +118,7 @@ module.exports = class Command
 
 	// random(Array)
 	//		Returns a random element in the array
-	random(arr) { return arr[Math.floor(Math.random() * arr.length)] }
+	random(arr) { return new Random().choose(arr) }
 
 	// randomHonorific(String)
 	//		Returns a random honorific, prefixed with the 'connector'

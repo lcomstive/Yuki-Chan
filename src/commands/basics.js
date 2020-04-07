@@ -46,26 +46,6 @@ module.exports = class BasicCommands extends Command
 					 	 )
 				}
 			}
-			/*
-			,
-			{
-				aliases: [ 'nsfw', 'lewd' ],
-				content: 'NSFW (*nsfw, lewd*)',
-				emoji: '😳',
-				callback: (msg, emoji) =>
-				{
-					if(!this.isNSFW(msg))
-					{
-						msg.channel.send(this.randomNotNSFW())
-						return
-					}
-					msg.channel.send(new RichEmbed()
-						.setDescription(`**Yuki-Chan NSFW Commands**`)
-						.addField('`<hentai|rule34|r34> (count) (tag)`', 'Sends between 1 and 5 hentai images (*using search tag if given*)(*default is 1 image*)')
-						)
-				}
-			}
-			*/
 		]
 
 		// Add internal commands
