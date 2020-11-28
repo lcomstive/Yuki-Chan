@@ -1,6 +1,6 @@
 const Debug = require('../debug.js')
 const Random = require('../random.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js')
 
 const DefaultDialogueFormat 	  = '$CONTENT$\n$OPTIONS$'
 const DefaultDialogueOptionFormat = ' - $EMOJI$ - *$OPTION$*'
@@ -14,17 +14,17 @@ module.exports = class Command
 	getGuild(msg) { return msg.guild ? msg.guild.id : msg.channel.id }
 
 	/*
-	formatEmbed(
+	sendDialogueOptions(
 				msg 	: Discord Message - The command message replying to
 				content : string
-				options : array - An array (maximum length of 5) with objects having format
+				options : array - An array (maximum length of 5) with each object having the format
 					{
 						'content'  - What to display the option as
 						'emoji'	   - An emoji for the user to react to, which is how they choose options
-										REQUIRED UNICODE CHARACTER (just copy/paste from https://emojipedia.org/)
+										REQUIRED UNICODE CHARACTER (just copy-paste from https://emojipedia.org/)
 						'callback' - Function to be called when option is selected
 							Callback(
-								msg   	 : Discord Message - the original dialogue message, same as passed to formatEmbed(...)
+								msg   	 : Discord Message - the original dialogue message, same as passed to sendDialogueOptions(...)
 								emoji 	 : string		   - the emoji reacted
 								userData : objects		   - user data supplied to function, otherwise undefined
 							)
@@ -35,10 +35,14 @@ module.exports = class Command
 						'$AUTHOR$'  with the user who triggered the dialogue (DiscordGuildMember if guild, otherwise DiscordUser)
 						'$CONTENT$' with the dialogue message
 						'$OPTIONS$' with the formatted options
+
+					e.g. "$AUTHOR$ says '$CONTENT$'"
 				dialogueOptionFormat : string - A string for the format of the dialogue options
 					replaces
 						'$EMOJI$'  with the emoji for the option
 						'$OPTION$' with the nae of the option
+
+					e.g. "$EMOJI$ for $OPTION$"
 				customFilter : function(DiscordReaction, DiscordUser)
 					- A callback that returns a boolean to filter out reaction events
 					e.g. (reaction, user) => { return !user.presence.game } // only get reactions from users who are currently in a game
@@ -59,6 +63,8 @@ module.exports = class Command
 			options = options.slice(0, 5)
 		let usedEmojis = [],
 			optionsText = ''
+		
+		options = options.filter(x => x != null && x.emoji != null && x.emoji != "")
 		for(let i = 0; i < options.length; i++)
 		{
 			if(!options[i].emoji || usedEmojis.includes(options[i].emoji))
@@ -69,42 +75,34 @@ module.exports = class Command
 								}`
 		}
 
-		let embed = new RichEmbed().setDescription((dialogueFormat || DefaultDialogueFormat)
+		let embed = new MessageEmbed().setDescription((dialogueFormat || DefaultDialogueFormat)
 										.replace(/\$CONTENT\$/gi, content)
 										.replace(/\$OPTIONS\$/gi, optionsText)
 										.replace(/\$AUTHOR\$/gi,  msg.member ? msg.member.displayName : msg.author.username)
 									)
 		if(embedColour)
 			embed.setColor(embedColour)
-		msg.channel.send(embed).then((sentMessage) =>
+		msg.channel.send(embed).then(sentMessage =>
 		{
-			let collector = sentMessage.createReactionCollector(
-					// filter so only calls if emoji from options, alongside any custom filter
-					(reaction, user) => !user.bot && options.find(x => x.emoji == reaction.emoji.name) && (customFilter ? customFilter(reaction, user) : true)
-				)
-			collector.on('collect', reaction =>
-			{
-				try
-				{
-					let option = options.find(x => x.emoji == reaction.emoji.name)
-					try { option.callback(msg, reaction.emoji.name, userData) }
-					catch(e) { Debug.error(e, `Failed to call dialogue option callback for reaction '${reaction.emoji.name}'`, msg) }
-					if(sentMessage.channel.type != 'dm' && sentMessage.channel.type != 'group' &&
-								sentMessage.guild.me &&
-								sentMessage.guild.me.hasPermission('MANAGE_MESSAGES')
-							)
-						sentMessage.clearReactions()
-					collector.stop()
-				}
-				catch(e) { Debug.error(e, `Failed to collect emoji '${reaction.emoji.name}'`)}
-			})
-
 			for(let i = 0; i < options.length; i++)
-			{
-				if(!options[i].emoji)
-					continue
-				try { sentMessage.react(options[i].emoji) } catch(e) { Debug.error(e, `Failed to add reaction '${options[i].emoji}'`, msg) }
-			}
+				sentMessage.react(options[i].emoji)
+		
+			sentMessage.awaitReactions(
+				(reaction, user) =>
+						!user.bot &&
+						options.find(x => x.emoji == reaction.emoji.name) &&
+						(customFilter ? customFilter(reaction, user) : true)
+				, { max: 1, time: 60000, errors: [ 'time' ] })
+				.then(collected =>
+					{
+						const emojiName = collected.first().emoji.name
+						let option = options.find(x => x.emoji == emojiName)
+
+						try { option.callback(msg, emojiName, userData) }
+						catch(e) { Debug.error(e, `Failed to call dialogue option callback for reaction '${emojiName}`, msg) }
+
+						try { sentMessage.reactions.removeAll() } catch(e) { Debug.error(e, `Failed to clear reactions`) /* Don't have permissions to clear reactions */ }
+					})
 		})
 	}
 

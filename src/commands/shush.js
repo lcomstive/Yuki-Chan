@@ -1,7 +1,7 @@
 const Command = require('./command.js')
 const Config = require('../config.js')
 const Index = require('../index.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = class Experience extends Command
 {
@@ -12,7 +12,7 @@ module.exports = class Experience extends Command
 
 		// shush|mute <user>
 		//		Shows the amount of experience the sender has globally
-		router.add(/^(shush|mute|unshush|unmute) @(.*)/i, (params, msg) =>
+		router.add(/^(shush|mute|unshush|unmute) @(.*)/i, async (params, msg) =>
 		{
 			let mutedRole = (this.config.guilds[msg.guild.id] = this.config.guilds[msg.guild.id] || -1)
 			if(mutedRole <= -1)
@@ -21,7 +21,7 @@ module.exports = class Experience extends Command
 				return
 			}
 
-			let role = msg.guild.roles.find(x => x.id == mutedRole)
+			let role = await msg.guild.roles.fetch(mutedRole)
 			if(!role)
 			{
 				msg.channel.send('Mute role could not be found, try setting it again with `mute|shush setrole @role`')
@@ -37,27 +37,27 @@ module.exports = class Experience extends Command
 
 			params[0] = params[0].toLowerCase()
 			let mute = params[0] == 'shush' || params[0] == 'mute'
-			let isMuted = mutedUser.roles.find(x => x.id == mutedRole)
+			let isMuted = mutedUser.roles.cache.find(x => x.id == mutedRole)
 			if(mute)
 			{
 				if(isMuted)
 				{
-					msg.channel.send(`'${mutedUser.displayName}${this.randomHonorific()}' is already muted`)
+					msg.channel.send(`'${mutedUser.displayName}${this.randomHonorific()}' is already shushed`)
 					return
 				}
-				mutedUser.addRole(role, 'Muted').catch(console.error)
+				mutedUser.roles.add(role, 'Muted').catch(console.error)
 			}
 			else
 			{
 				if(!isMuted)
 				{
-					msg.channel.send(`'${mutedUser.displayName}${this.randomHonorific()}' isn't muted`)
+					msg.channel.send(`'${mutedUser.displayName}${this.randomHonorific()}' isn't shushed`)
 					return
 				}
-				mutedUser.removeRole(role, 'Unmuted').catch(console.error)
+				mutedUser.roles.remove(role, 'Unmuted').catch(console.error)
 			}
 
-			msg.channel.send(`${mutedUser.displayName}${this.randomHonorific()} has been ${mute ? '' : 'un'}muted`)
+			msg.channel.send(`${mutedUser.displayName}${this.randomHonorific()} has been ${mute ? '' : 'un'}shushed`)
 		}, { guildsOnly: true })
 		// shush|mute setrole @role
 		//		Assigns a role for anyone that is shushed
@@ -80,7 +80,7 @@ module.exports = class Experience extends Command
 		//		Shows available commands for the 'shush'/'mute' commands
 		.add(/^(help (shush|unshush|mute|unmute))|((shush|unshush|mute|unmute) help)/i, (params, msg) =>
 		{
-			let embed = new RichEmbed()
+			let embed = new MessageEmbed()
 
 			embed.addField('`shush|mute @user`', 'Mutes the specified user')
 				  .addField('`unshush|unmute @user`', 'Unmutes the specified user')

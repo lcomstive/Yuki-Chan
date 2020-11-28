@@ -1,7 +1,7 @@
 const Command = require('./command.js')
 const Config = require('../config.js')
 const Debug = require('../debug.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = class BasicCommands extends Command
 {
@@ -16,7 +16,7 @@ module.exports = class BasicCommands extends Command
 				aliases: [ 'misc', 'general', 'fun' ],
 				content: 'General (*misc, general, fun*)',
 				emoji: '🎉',
-				callback: (msg, emoji) => msg.channel.send(new RichEmbed()
+				callback: (msg, emoji) => msg.channel.send(new MessageEmbed()
 												.setDescription(`**Yuki-Chan Misc. Commands**`)
 												.addField('`avatar (@user)`', 'Obtains the avatar of the user mentioned (*or sender if none*)')
 												.addField('`exp (@user)`', 'Shows the level and experience of the user mentioned (*or sender if none*)')
@@ -38,10 +38,10 @@ module.exports = class BasicCommands extends Command
 						msg.channel.send(this.randomNotAdmin())
 						return
 					}
-					msg.channel.send(new RichEmbed()
+					msg.channel.send(new MessageEmbed()
 						 .setDescription(`**Yuki-Chan Admin Commands**`)
-						 .addField('`token <token>`', 'Changes the command token required to call commands (*default is `!`*)').addBlankField()
-						 .addField('`adminrole <add|remove> "role" "@role"`', 'Adds or removes roles as `admin`, letting the users in said roles to access administrative commands').addBlankField()
+						 .addField('`token <token>`', 'Changes the command token required to call commands (*default is `!`*)')
+						 .addField('`adminrole <add|remove> "role" "@role"`', 'Adds or removes roles as `admin`, letting the users in said roles to access administrative commands')
 						 .addField('`adminrole list`', 'Lists all roles currently set as admin')
 					 	 )
 				}
@@ -62,7 +62,7 @@ module.exports = class BasicCommands extends Command
 		{
 			if(!params[0])
 			{
-				msg.channel.send(`Try \`token <token>\` where <token> is anywhere from 1 to 4 characters (*e.g.* \`token yc!\`)`)
+				msg.channel.send(`Try \`token <token>\` where <token> is anywhere from 1 to 3 characters (*e.g.* \`token yc!\`)`)
 				return
 			}
 			this.config.guilds[this.getGuild(msg)].commandToken = params[0].substring(1)
@@ -71,31 +71,21 @@ module.exports = class BasicCommands extends Command
 		}, { adminRequired: true })
 		// adminrole list
 		//		Lists all admin roles on the current guild
-		.add(/^adminrole list$/i, (params, msg) =>
+		.add(/^adminrole list$/i, async (params, msg) =>
 		{
-			if(msg.channel.type == 'dm' || msg.channel.type == 'group')
-			{
-				msg.channel.send('That command is only available in guilds (*not group or direct messages*)')
-				return
-			}
 			let roles = this.config.guilds[this.getGuild(msg)].adminRoles || []
 			let roleList = `Admin Roles: (\`${roles.length}\`)`
 			for(let i = 0; i < roles.length; i++)
-				roleList += `\n - ${msg.guild.roles.get(roles[i]).name}`
+				await msg.guild.roles.fetch(roles[i]).then(role => roleList += `\n - ${role.name}`)
 			msg.channel.send(roleList)
-		}, { adminRequired: true }) // adminRequired
+		}, { adminRequired: true, guildsOnly: true }) // adminRequired
 		// adminrole <add|remove> "role" "@role"
 		//		Adds or removes the given roles as
-		.add(/^adminrole (add|remove) (.*)/i, (params, msg) =>
+		.add(/^adminrole (add|remove) (.*)/i, async (params, msg) =>
 		{
-			if(msg.channel.type == 'dm' || msg.channel.type == 'group')
-			{
-				msg.channel.send('That command is only available in guilds (*not group or direct messages*)')
-				return
-			}
 			if(!params[1] || !params[1].includes('"'))
 			{
-				msg.channel.send('Format: `adminrole (add|remove) "@role"` (*requires quotes*)')
+				msg.channel.send('Format: `adminrole (add|remove) "@role1" "@role2"` (*requires quotes*)')
 				return
 			}
 			let roleMatches = params[1].match(/["'].*?["']/g)
@@ -109,7 +99,7 @@ module.exports = class BasicCommands extends Command
 					roleIDs.push(rawRole.substring(3, rawRole.length - 1))
 				else // otherwise it's the name of the role
 				{
-					let role = msg.guild.roles.find(x => x.name.toLowerCase() == rawRole)
+					let role = await msg.guild.roles.resolve(rawRole)
 					if(!role)
 					{
 						msg.channel.send(`Couldn't find the role '${rawRole}'`)
@@ -127,7 +117,8 @@ module.exports = class BasicCommands extends Command
 			msg.channel.send(`${params[0].toLowerCase() == 'add' ? 'Added' : 'Removed'} ${roleIDs.length} admin role${roleIDs.length == 1 ? '' : 's'}`)
 		}, {
 			adminRequired: true,
-			dirtyMessage:  true
+			dirtyMessage:  true,
+			guildsOnly: true
 		})
 		.add(/^help( \w+)?$/i, (params, msg) =>
 		{

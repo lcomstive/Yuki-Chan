@@ -1,5 +1,7 @@
 const Command = require('./command.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed, MessageAttachment } = require('discord.js')
+
+const AvatarSize = 2048 // Minimum 16, Maximum 4096. Power of 2 (https://discord.js.org/#/docs/main/master/typedef/ImageURLOptions)
 
 module.exports = class Avatar extends Command
 {
@@ -8,7 +10,7 @@ module.exports = class Avatar extends Command
 		// 'help avatar', 'avatar help'
 		router.add(/^(help avatar)|(avatar help)/i, (params, message) =>
 		{
-			message.channel.send('Avatar Help', new RichEmbed()
+			message.channel.send('Avatar Help', new MessageEmbed()
 				.addField('`avatar (@user)`', 'Obtains the image for the mentioned user (*or the sender if none given*)')
 			)
 		})
@@ -20,7 +22,10 @@ module.exports = class Avatar extends Command
 			{
 				let user = message.mentions.users.first()
 				console.log(`Fetching avatar of '${user.username}'`)
-				message.channel.send({ files: [{ attachment: user.displayAvatarURL, name: `${user.username}_avatar.jpg` }]})
+				if(user.avatar)
+					message.channel.send(new MessageAttachment(user.avatarURL({ dynamic: true, size: AvatarSize })))
+				else
+					message.channel.send('User has no avatar...');
 			}
 			catch(e)
 			{
@@ -44,7 +49,10 @@ module.exports = class Avatar extends Command
 					return
 				}
 				console.log(`Fetching avatar of '${member.displayName}'`)
-				message.channel.send({ files: [{ attachment: member.user.displayAvatarURL, name: `${member.displayName}_avatar.jpg` }]})
+				if(user.avatar)
+					message.channel.send(new MessageAttachment(user.avatarURL({ dynamic: true, size: AvatarSize })))
+				else
+					message.channel.send('User has no avatar...');
 			}
 			catch(e)
 			{
@@ -56,8 +64,11 @@ module.exports = class Avatar extends Command
 		// avatar
 		.add(/^avatar/i, (params, message) =>
 		{
-			console.log(`Fetching avatar of '${message.author.username}'`)
-			message.channel.send({ files: [ { attachment: message.author.displayAvatarURL, name: `${message.author.username}_avatar.jpg` } ]})
+			console.log(`Fetching avatar of '${message.author.username}' (${message.author.avatar})`)
+			if(message.author.avatar)
+				message.channel.send(new MessageAttachment(message.author.avatarURL({ dynamic: true, size: AvatarSize })))
+			else
+				message.channel.send('User has no avatar...')
 		})
 	}
 }

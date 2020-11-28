@@ -2,7 +2,7 @@ const url = require('url')
 const http = require('http')
 const Command = require('./command.js')
 const Config = require('../config.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js')
 
 const DefaultReactions =
 {
@@ -142,7 +142,7 @@ module.exports = class Reactions extends Command
 					continue
 				listMsg += `\n - [\`${val.length}\`] \t${key}`
 			}
-			msg.channel.send(new RichEmbed().setDescription(listMsg))
+			msg.channel.send(new MessageEmbed().setDescription(listMsg))
 		})
 		// reaction format <reaction> <format>
 		// reaction format help
@@ -162,12 +162,11 @@ module.exports = class Reactions extends Command
 				this.config.guilds[guildID].formats = DefaultFormats
 			if(params[1].toLowerCase() == 'help')
 			{
-				let help = new RichEmbed()
+				let help = new MessageEmbed()
 				.setDescription('Reaction Format Parameters:')
 				.addField('`$REACT`', 'The reaction used (*.e.g. \'hug\', \'slap\'*)', true)
 				.addField('`$SENDER`', 'The sender of the reaction (*Yuki if no receiver was given)')
 				.addField('`$USER`', 'The receiver of the reaction (*the sender if none given*)', true)
-				.addBlankField()
 				.addField('Example', 'To get slaps to read `"give @user a slap"` you can do `reaction format slap give $USER a $REACT`')
 				msg.channel.send('`reaction format <reaction> <format>`', help)
 				return
@@ -254,7 +253,7 @@ module.exports = class Reactions extends Command
 					this.config.guilds[guildID][params[1].toLowerCase()] = this.config.guilds[guildID][params[1].toLowerCase()] || []
 					this.config.guilds[guildID][params[1].toLowerCase()].push(link)
 					this.config.save()
-					msg.channel.send(new RichEmbed()
+					msg.channel.send(new MessageEmbed()
 								.setDescription(`Added to '${params[1].toLowerCase()}'`)
 								.setImage(link)
 							)
@@ -338,7 +337,7 @@ module.exports = class Reactions extends Command
 									name + this.randomHonorific(mentions ? ' ' : '-')
 								)
 			message.channel.send(reactionText, reaction ?
-									new RichEmbed()
+									new MessageEmbed()
 										.setAuthor(name == authorName ? authorName : `${authorName} -> ${name}`)
 										.setColor(colour)
 										.setImage(reaction)
@@ -393,7 +392,7 @@ module.exports = class Reactions extends Command
 							'RANDOM'
 			reaction = this.random(reactions)
 			msg.channel.send(reactionText, reaction ?
-									new RichEmbed()
+									new MessageEmbed()
 										.setAuthor(name == authorName ? authorName : `${authorName} -> ${name}`)
 										.setColor(colour)
 										.setImage(reaction)
@@ -406,23 +405,18 @@ module.exports = class Reactions extends Command
 		//		Sends command usage and description for reactions
 		.add(/^(help react)|((react|reaction) help)/i, (params, msg) =>
 		{
-			msg.channel.send('Reaction Commands', new RichEmbed()
+			msg.channel.send('Reaction Commands', new MessageEmbed()
 			.addField('`<slap|hug|pat|dance> (@user)`', 'Sends a random image from a list of available reactions (current guild images included)\n' +
 													  '(*.e.g* `slap @Yuki-Chan`, `hug`)')
-			.addBlankField()
 			.addField('`react <reaction> (@user)`', 'Sends a random image from a list of available reactions in the current guild\n' +
 															'(*.e.g* `react highfive @Yuki-Chan`, `react hug`)')
-			.addBlankField()
 			.addField('`reaction list (reaction)`', 'Lists all images in the current guild for the given reaction, or all available reactions if none given\n(*e.g.* `reaction list hug`)')
-			.addBlankField()
 			.addField('`reaction format <reaction> <contents>`', 'Sets the format for the given reaction in the current guild\n' +
 																		 '(*.e.g.* `reaction format slap $REACTs $USER hard`)\n' +
 																		 '(`reaction format help` for available parameters)')
-			.addBlankField()
 			.addField('`reaction <color|colour> <reaction> <colour>`', 'Sets the embed colour shown next to the given reaction in the current guild\n' +
 																			   '(*.e.g* `reaction colour slap #f44242`, `reaction colour default red`, `reaction colour hug random`)\n' +
 																			   '(*See [discord.js.org](https://discord.js.org/#/docs/main/stable/typedef/ColorResolvable) for all colours*)')
-			.addBlankField()
 			.addField('`reaction <add|remove> <reaction> <url>`', 'Adds or removes an image (url) with the given tag (reaction) for the current guild\n' +
 																		  'Removal can either be a URL or index\n' +
 																	  	  '(*e.g.* `reaction remove hug https://i.imgur.com/QJbBsDJ.gif`, `reaction remove slap 2`)')

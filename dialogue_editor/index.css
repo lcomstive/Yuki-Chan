@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+:root
+{
+	--foreground: #fff;
+	--background: #3a424f;
+	--font-size: 3vw;
+
+	--node-width: 150px;
+	--node-height: 150px;
+	--node-background: #5a6b87;
+	--node-border-radius: 0px;
+	--node-border-width: 1px;
+	--node-border-colour: #505e75;
+
+	--node-connector-size: 15px;
+	--node-connector-fill: #fff;
+	--node-connector-radius: 50px;
+
+	--context-width: 150px;
+	--context-height: 200px;
+	--context-border-radius: 3px;
+	--context-border-colour: #607599;
+	--context-background: #566989;
+	--context-foreground: #fff;
+	--context-border-width: 3px;
+
+	--scrollbar-width: 5px;
+	--scrollbar-background: rgba(0, 0, 0, 0.2);
+	--scrollbar-thumb-colour: rgba(0, 0, 0, 0.3);
+	--scrollbar-thumb-colour-hover: rgba(0, 0, 0, 0.5);
+
+	--emoji-list-border-radius: 3px;
+	--emoji-list-border-width: 1.5px;
+	--emoji-list-background: rgba(0, 0, 0, 0.1);
+
+	--emoji-list-emoji-width: 30px;
+	--emoji-list-emoji-border-width: 3px;
+	--emoji-list-emoji-background: rgba(255, 255, 255, 0.1);
+	--emoji-list-emoji-border-colour: rgba(0, 0, 0, 0.4);
+	--emoji-list-emoji-background-hover: rgba(0, 0, 0, 0.2);
+	--emoji-list-emoji-background-active: rgba(255, 255, 255, 0.3);
+
+	--node-path-size: 3px;
+	--node-path-colour: #5b76a3;
+}
+
+body, html, *
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: var(--font-size);
+
+	color: var(--foreground);
+	margin: 0;
+}
+
+body { width: 100%; height: 100%; }
+
+button:focus { outline: none; }
+
+input::placeholder
+{
+	color: var(--foreground);
+	opacity: 0.35;
+}
+
+.dialogue
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: var(--background);
+}
+
+.node
+{
+	margin: 0;
+	position: absolute;
+	width: var(--node-width);
+	height: var(--node-height);
+	border: var(--node-border-width) solid var(--node-border-colour);
+	border-radius: var(--node-border-radius);
+	background-color: var(--node-background);
+}
+
+.node_content
+{
+	color: var(--foreground);
+	position: absolute;
+	border: none;
+	background: none;
+	border-radius: var(--border-radius);
+	border-top: 0.75px solid rgba(0, 0, 0, 0.2);
+	mask-border-width: 80%;
+	width: calc(var(--node-width) - var(--node-connector-size) * 2);
+	top: 10px;
+	bottom: 45px;
+	left: var(--node-connector-size);
+	box-sizing: border-box;
+
+	resize: none;
+	outline: none;
+}
+
+.node_content:hover
+{
+	background-color: rgba(0, 0, 0, 0.03);
+}
+
+.node_remove
+{
+	position: absolute;
+	color: var(--foreground);
+	border: none;
+	background: rgba(0, 0, 0, 0.06);
+	bottom: 10px;
+	height: 2em;
+	width: calc(var(--node-width) - var(--node-connector-size) * 2);
+	left: var(--node-connector-size);
+	border-radius: var(--node-border-radius);
+}
+
+.node_connector
+{
+	z-index: 10;
+	text-align: center;
+	position: absolute;
+	top: 10px;
+	font-size: calc(var(--node-connector-size) * 0.7);
+	width: var(--node-connector-size);
+	height: var(--node-connector-size);
+	border-radius: var(--node-connector-radius);
+	background-color: var(--node-connector-fill);
+
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+.node_input
+{
+	left: calc(0px - var(--node-connector-size) / 2);
+}
+
+.node_output
+{
+	left: calc(var(--node-width) - var(--node-connector-size) / 2);
+	margin: 0;
+	margin-top: 10px;
+}
+
+.context_menu
+{
+	z-index: 10;
+	display: none;
+	position: absolute;
+
+	width: var(--context-width);
+	height: var(--context-height);
+	color: var(--context-foreground);
+	background: var(--context-background);
+	border: var(--context-border-width) solid var(--context-border-colour);
+	border-radius: var(--context-border-radius);
+}
+
+.context_menu.active { display: block; }
+
+.context_menu *
+{
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	width: calc(100% - 20px);
+	border-radius: var(--context-border-radius);
+}
+
+.context_search
+{
+	top: 10px;
+	height: 17.5px;
+	width: calc(100% - 25px);
+	border: none;
+	border-radius: var(--context-border-radius);
+	background: rgba(0, 0, 0, 0.2);
+	color: var(--context-foreground);
+	padding-left: 5px;
+}
+
+.context_search::placeholder
+{
+	color: rgba(255, 255, 255, 0.4);
+}
+
+.context_button_remove
+{
+	display: block;
+	bottom: 10px;
+	background: rgba(0, 0, 0, 0.1);
+	color: var(--context-foreground);
+	border: none;
+	border-radius: var(--context-border-radius);
+}
+
+.context_emoji_list
+{
+	top: 35px;
+	background: var(--emoji-list-background);
+	height: calc(100% - 75px);
+	overflow-y: auto;
+}
+
+.context_emoji_list button
+{
+	position: absolute;
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 0;
+	background: rgba(0, 0, 0, 0.1);
+	border: var(--emoji-list-emoji-border-width) solid var(--emoji-list-emoji-border-colour);
+}
+
+.active_emoji { background: var(--emoji-list-emoji-background-active) !important; }
+.context_emoji_list button:hover { background: var(--emoji-list-emoji-background-hover); }
+
+.import, .export
+{
+	color: var(--foreground);
+	background: var(--node-background);
+	position: absolute;
+	right: 20px;
+	bottom: 20px;
+	width: 100px;
+	height: 25px;
+	border: var(--node-border-width) solid var(--node-border-colour);
+	border-radius: var(--node-border-radius);
+}
+
+.import { bottom: 55px; }
+
+.import_export_modal, .import_export_modal_text
+{
+	display: none;
+	position: absolute;
+	left: 25vw;
+	top: 30vh;
+	width: 50vw;
+	height: 40vh;
+	background: var(--context-background);
+	color: var(--context-foreground);
+	border: none;
+	padding: 0;
+	margin: 0;
+	border-radius: var(--node-border-radius);
+}
+
+.import_export_modal_text
+{
+	display: block;
+	left: 25px; right: 25px;
+	top: 40px; bottom: 25px;
+	width: calc(100% - 50px);
+	height: calc(100% - 90px);
+	background: none;
+	resize: none;
+}
+
+.import_export_modal p
+{
+	opacity: 0.6;
+	position: absolute;
+	left: 25px;
+	top: 10px;
+	height: 25px;
+	border-radius: var(--node-border-radius);
+}
+
+.import_export_modal button
+{
+	position: absolute;
+	left: 25px;
+	bottom: 10px;
+	height: 25px;
+	width: calc(100% - 50px);
+	background: var(--node-background);
+	border: var(--node-border-width) solid var(--node-border-colour);
+	border-radius: var(--node-border-radius);
+}
+
+.import_export_modal.active { display: block; }
+
+path
+{
+	fill: none;
+	stroke: var(--node-path-colour);
+	stroke-width: var(--node-path-size);
+}
+
+::-webkit-scrollbar { width: var(--scrollbar-width); }
+::-webkit-scrollbar-track { background: var(--scrollbar-track-colour); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-colour); }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-colour-hover); }
