@@ -1,7 +1,7 @@
 {
-  "name": "coffeeloverbot",
+  "name": "yuki-chan",
   "version": "1.0.0",
-  "description": "CoffeeLover Studio's own Discord bot",
+  "description": "Waifu Discord bot",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -10,7 +10,7 @@
     "deploy": "now -E --public --npm"
   },
   "author": "lcomstive",
-  "repository": "https://github.com/CoffeeLoverStudios/CoffeeLoverBot",
+  "repository": "https://github.com/lcomstive/Yuki-Chan",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^12.5.1",
