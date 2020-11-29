@@ -166,7 +166,7 @@ module.exports = class BasicCommands extends Command
 			return true // Owner of guild
 		let guildID = msg.guild.id
 		if(this.config.guilds[guildID].adminRoles &&
-			this.config.guilds[guildID].adminRoles.filter(x => msg.member.roles.has(x)).length > 0)
+			this.config.guilds[guildID].adminRoles.filter(x => msg.member.roles.cache.has(x)).length > 0)
 			return true
 		return false
 	}

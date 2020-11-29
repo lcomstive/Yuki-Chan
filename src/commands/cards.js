@@ -83,7 +83,6 @@ module.exports = class Cards extends Command
 			user = user.guilds[message.guild.id]
 			if(!user.daily)
 			{
-				let newDate = new Date()
 				user.daily =
 				{
 					consecutiveDays: 0,

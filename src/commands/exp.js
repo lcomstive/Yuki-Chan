@@ -1,6 +1,6 @@
 const Command = require('./command.js')
 const Config = require('../config.js')
-const { RichEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = class Experience extends Command
 {
@@ -84,7 +84,7 @@ module.exports = class Experience extends Command
 		//		Shows available commands for the 'exp' command
 		.add(/^(help exp)|(exp help)/i, (params, msg) =>
 		{
-			msg.channel.send('Experience Help', new RichEmbed()
+			msg.channel.send('Experience Help', new MessageEmbed()
 			.addField('Experience Distribution', `10-30 experience is randomly generated and given for each message sent, with a ${this.config.messageCooldown} second cooldown\n` +
 												 'Experience and levels are per-server, but overall experience can be shown with `exp global`')
 			.addBlankField()
@@ -124,8 +124,10 @@ module.exports = class Experience extends Command
 
 		if(!user.guilds)
 			user.guilds = {}
-		if(user.guilds[guildID] && user.guilds[guildID].lastMessage && this.config.messageCooldown && (Date.now() - new Date(user.guilds[guildID].lastMessage)) / 1000 < this.config.messageCooldown)
+			if(user.guilds[guildID] && user.guilds[guildID].lastMessage && this.config.messageCooldown && (Date.now() - new Date(user.guilds[guildID].lastMessage)) / 1000 < this.config.messageCooldown)
 			return // cooldown is still in effect
+		if(!user.guilds[guildID])
+			user.guilds[guildID] = { lastMessage: 0 }
 		user.guilds[guildID].lastMessage = Date.now()
 
 		// Update the total count
@@ -148,7 +150,7 @@ module.exports = class Experience extends Command
 		if(user.guilds[guildID].exp >= ((user.guilds[guildID].lvl || 1) + 1) * 200)
 		{
 			user.guilds[guildID].lvl = (user.guilds[guildID].lvl || 1) + 1
-			message.channel.send(new RichEmbed()
+			message.channel.send(new MessageEmbed()
 				.setTitle('Level Up!')
 				.setDescription(`${message.member ? message.member.displayName : message.author.username}${this.randomHonorific()} leveled up to **level ${user.guilds[guildID].lvl}**`)
 				.setImage(message.author.displayAvatarURL)

@@ -75,7 +75,10 @@ module.exports = class Command
 								}`
 		}
 
-		let embed = new MessageEmbed().setDescription((dialogueFormat || DefaultDialogueFormat)
+		console.log(`Content:\n${content}`)
+		console.log(`Options:\n${optionsText}`)
+		let embed = new MessageEmbed().setDescription(
+									(dialogueFormat || DefaultDialogueFormat)
 										.replace(/\$CONTENT\$/gi, content)
 										.replace(/\$OPTIONS\$/gi, optionsText)
 										.replace(/\$AUTHOR\$/gi,  msg.member ? msg.member.displayName : msg.author.username)
@@ -85,7 +88,7 @@ module.exports = class Command
 		msg.channel.send(embed).then(sentMessage =>
 		{
 			for(let i = 0; i < options.length; i++)
-				sentMessage.react(options[i].emoji)
+				sentMessage.react(options[i].emoji).catch('Failed to react to message?')
 		
 			sentMessage.awaitReactions(
 				(reaction, user) =>
@@ -103,6 +106,7 @@ module.exports = class Command
 
 						try { sentMessage.reactions.removeAll() } catch(e) { Debug.error(e, `Failed to clear reactions`) /* Don't have permissions to clear reactions */ }
 					})
+				.catch(collected => console.log('Failed to get user reaction to dialogue'))
 		})
 	}
 

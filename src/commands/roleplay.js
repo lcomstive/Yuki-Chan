@@ -185,7 +185,17 @@ module.exports = class Roleplay extends Command
 			return
 		}
 		console.log(`Comparing emoji for '${emoji}'`)
-		user.currentDialogue.nodeID = route.nodes[user.currentDialogue.nodeID].options.find(x => x.emojiRaw == emoji).next
+		user.currentDialogue.nodeID = route.nodes[user.currentDialogue.nodeID].options.find(x => x.emojiRaw == emoji)
+		if(user.currentDialogue.nodeID)
+			user.currentDialogue.nodeID = user.currentDialogue.nodeID.next
+		else
+		{
+			console.log('No next for option? Aborting')
+			data.caller.config.users[data.userIndex].currentDialogue = undefined
+			data.caller.config.save()
+			discordMsg.channel.send(`Something seems to have gone wrong, try again`)
+			return
+		}
 
 		console.log(`Next node: ${user.currentDialogue.nodeID}`)
 		if(user.currentDialogue.nodeID < 0 /* || route.nodes[user.currentDialogue.nodeID].options.length == 0 */) // end of dialogue
@@ -225,13 +235,12 @@ module.exports = class Roleplay extends Command
 		if(!user.currentDialogue.nodeID || user.currentDialogue.nodeID < 0)
 			user.currentDialogue.nodeID = 0
 		let currentNode = route.nodes[user.currentDialogue.nodeID]
-		Debug.log(`Current Node: (#${user.currentDialogue.nodeID})\n\t${JSON.stringify(currentNode)}`)
+		// Debug.log(`Current Node: (#${user.currentDialogue.nodeID})\n\t${JSON.stringify(currentNode)}`)
 
 		let options = []
 		for(let i = 0; i < currentNode.options.length; i++)
 		{
 			let option = currentNode.options[i]
-			Debug.log(`Option: ${JSON.stringify(option)}`)
 			options.push({
 				content: option.content || '',
 				emoji: option.emojiRaw,
@@ -240,7 +249,6 @@ module.exports = class Roleplay extends Command
 		}
 		if(currentNode.options.length == 0)
 			this.config.users.find(x => x.id == user.id).currentDialogue = undefined
-		console.log(`Options: ${JSON.stringify(options)}`)
 
 		this.sendDialogueOptions(discordMsg,
 									currentNode.content,
