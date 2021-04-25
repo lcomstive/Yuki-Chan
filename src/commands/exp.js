@@ -2,6 +2,10 @@ const Command = require('./command.js')
 const Config = require('../config.js')
 const { MessageEmbed } = require('discord.js')
 
+expForLevel = (level) => (level + 1) * 200;
+
+expToNextLevel = (exp, currentLevel) => expForLevel(currentLevel + 1) - exp;
+
 module.exports = class Experience extends Command
 {
 	setup(router)
@@ -37,6 +41,11 @@ module.exports = class Experience extends Command
 			else
 				msg.channel.send(`${username}${this.randomHonorific()} has ${user.globalCount || 0} total EXP`)
 		}, { guildsOnly: true })
+		.add(/exp nextlevel/i, (params, msg) =>
+		{
+			let user = this.config.users[msg.author.id] ? this.config.users[msg.author.id] : {}
+			msg.channel.send(`${msg.member.displayName} needs ${expToNextLevel(user.guilds[msg.guild.id].exp || 0, user.guilds[msg.guild.id].lvl || 0)} more experience to level up`)
+		})
 		// exp global
 		//		Shows the amount of experience the sender has globally
 		.add(/exp global/i, (params, msg) =>
@@ -147,9 +156,9 @@ module.exports = class Experience extends Command
 		else
 			console.log('Couldn\'t find Cards command')
 
-		if(user.guilds[guildID].exp >= ((user.guilds[guildID].lvl || 1) + 1) * 200)
+		if(expToNextLevel(user.guilds[guildID].exp || 0, user.guilds[guildID].lvl || 0) < 0) // Level up!
 		{
-			user.guilds[guildID].lvl = (user.guilds[guildID].lvl || 1) + 1
+			user.guilds[guildID].lvl = (user.guilds[guildID].lvl || 0) + 1
 			message.channel.send(new MessageEmbed()
 				.setTitle('Level Up!')
 				.setDescription(`${message.member ? message.member.displayName : message.author.username}${this.randomHonorific()} leveled up to **level ${user.guilds[guildID].lvl}**`)

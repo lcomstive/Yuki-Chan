@@ -1,4 +1,5 @@
 .env
 config/
+log.txt
 node_modules/
 silent_start.sh
