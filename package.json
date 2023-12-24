@@ -1,23 +1,21 @@
 {
   "name": "yuki-chan",
   "version": "1.0.0",
-  "description": "Waifu Discord bot",
+  "description": "Another Discord bot",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "build": "node src/index.js",
-    "watch": "nodemon --watch src/ --exec \"heroku local\"",
-    "deploy": "now -E --public --npm"
+    "watch": "nodemon --watch src/",
+    "upload-commands": "node src/upload-commands.js"
   },
   "author": "lcomstive",
   "repository": "https://github.com/lcomstive/Yuki-Chan",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^12.5.1",
-    "request": "^2.88.2",
-    "slackbots": "^1.2.0"
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1"
   },
-  "optionalDependencies": {
-    "dotenv": "^6.0.0"
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
