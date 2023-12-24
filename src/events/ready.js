@@ -9,6 +9,6 @@ module.exports =
 	execute(client)
 	{
 		Debug.log(`\nYuki Chan ready`, Debug.levels.HIGH, Debug.colours.BRIGHT + Debug.colours.GREEN)
-		Debug.log(`\thttps://discordapp.com/oauth2/authorize?client_id=${clientID}&scope=bot`, Debug.levels.HIGH, Debug.colours.BRIGHT)
+		Debug.log(`\thttps://discord.com/api/oauth2/authorize?client_id=${clientID}&permissions=1101927623744&scope=bot`, Debug.levels.HIGH, Debug.colours.BRIGHT)
 	}
 }

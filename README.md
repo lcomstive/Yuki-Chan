@@ -13,11 +13,12 @@ when the prompt appears.
 From here you can set an icon and name (*if you want the bot name to be different
 to the application name*), then proceed to the `Token` area and copy it to `config/yuki-chan.json` in the `discordToken` property.
 
+While in this page, also turn on `Message Content Intent`
+
 It should now look like
 
 ```
 {
-	"defaultCommandToken": "!",
 	"discordToken": "CLIENT_TOKEN",
 	"clientID": "CLIENT_ID"
 }

@@ -2,10 +2,18 @@ const fs = require('fs')
 const path = require('path')
 const Debug = require('./debug.js')
 const Config = require('./config.js')
-const { Client, Events, Collection, GatewayIntentBits }
+const { Client, Collection, GatewayIntentBits, Partials, Events }
 	= require('discord.js')
 
-let client = new Client({ intents: [ GatewayIntentBits.Guilds ] })
+let client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMessageReactions
+	],
+	partials: [ Partials.Message, Partials.Channel, Partials.Reaction ]
+})
 
 Debug.setup()
 
@@ -61,6 +69,39 @@ loadEvents = () =>
 		})
 	Debug.log(`Loaded ${count} events`)
 }
+
+client.on(Events.MessageReactionAdd, async (reaction, user) =>
+{
+	// Check if reaction is a partial
+	// https://discordjs.guide/popular-topics/partials.html
+	if(reaction.partial)
+	{
+		try { await reaction.fetch() } // Fetch to check if message still exists and wasn't deleted
+		catch { return }
+	}
+
+	client.commands.forEach(cmd =>
+	{
+		if('onReaction' in cmd)
+			cmd.onReaction(reaction, user, true /* added */)
+	})
+})
+client.on(Events.MessageReactionRemove, async (reaction, user) =>
+{
+	// Check if reaction is a partial
+	// https://discordjs.guide/popular-topics/partials.html
+	if(reaction.partial)
+	{
+		try { await reaction.fetch() } // Fetch to check if message still exists and wasn't deleted
+		catch { return }
+	}
+
+	client.commands.forEach(cmd =>
+	{
+		if('onReaction' in cmd)
+			cmd.onReaction(reaction, user, false /* added */)
+	})
+})
 
 loadEvents()
 loadCommands()

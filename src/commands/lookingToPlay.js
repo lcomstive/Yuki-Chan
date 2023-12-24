@@ -1,5 +1,5 @@
 const Debug = require('../debug.js')
-const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require('discord.js')
+const { SlashCommandBuilder, ChannelType } = require('discord.js')
 
 module.exports =
 {

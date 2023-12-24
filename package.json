@@ -10,7 +10,7 @@
   },
   "author": "lcomstive",
   "repository": "https://github.com/lcomstive/Yuki-Chan",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1"
