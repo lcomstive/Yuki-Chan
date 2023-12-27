@@ -6,6 +6,7 @@ module.exports =
 	data: new SlashCommandBuilder()
 			.setName('looking-to-play')
 			.setDescription('Let people know you\'re looking for a group to join your game')
+			.setDMPermission(false) // Don't allow this to be used in direct messages
 			.addStringOption(option => option
 				.setName('game-name')
 				.setRequired(true)

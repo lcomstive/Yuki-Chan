@@ -1,3 +1,4 @@
+const Utils = require('../utils.js')
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js')
 
 const EmbedDescription = 'React to this message give yourself this role'
@@ -7,6 +8,7 @@ module.exports =
 	data: new SlashCommandBuilder()
 			.setName('assign-role')
 			.setDescription('Creates a prompt that users can react to for adding/removing their own roles')
+			.setDMPermission(false) // Don't allow this to be used in direct messages
 			.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 			.addRoleOption(option => option
 				.setName('role')
@@ -21,6 +23,15 @@ module.exports =
 		const role = interaction.options.getRole('role')
 		const emoji = interaction.options.getString('emoji') ?? '👍'
 
+		if(!Utils.canUseEmoji(emoji, interaction.guild))
+		{
+			await interaction.reply({
+				content: 'This bot cannot use that emoji, please use a different one',
+				ephemeral: true
+			})
+			return
+		}
+
 		const embed = new EmbedBuilder()
 			.setTitle(role.name)
 			.setColor(role.color)
@@ -28,6 +39,14 @@ module.exports =
 		
 		const msg = await interaction.reply({ embeds: [embed], fetchReply: true })
 		msg.react(emoji)
+	},
+
+	generateMessage(role)
+	{
+		return new EmbedBuilder()
+			.setTitle(role.name)
+			.setColor(role.color)
+			.setDescription(EmbedDescription)
 	},
 
 	onReaction(reaction, user, added)
