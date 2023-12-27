@@ -16,12 +16,16 @@ module.exports =
 				.setDescription('Role to assign with this message'))
 			.addStringOption(option => option
 				.setName('emoji')
-				.setDescription('Emoji to use for reaction, defaults to 👍')),
-
+				.setDescription('Emoji to use for reaction, defaults to 👍'))
+			.addStringOption(option => option
+				.setName('description')
+				.setDescription('Additional information to provide')),
+			
 	async execute(interaction)
 	{
 		const role = interaction.options.getRole('role')
 		const emoji = interaction.options.getString('emoji') ?? '👍'
+		const description = interaction.options.getString('description')
 
 		if(!Utils.canUseEmoji(emoji, interaction.guild))
 		{
@@ -32,28 +36,30 @@ module.exports =
 			return
 		}
 
-		const embed = new EmbedBuilder()
-			.setTitle(role.name)
-			.setColor(role.color)
-			.setDescription(EmbedDescription)
+		const embed = this.generateMessage(role, description)
 		
 		const msg = await interaction.reply({ embeds: [embed], fetchReply: true })
 		msg.react(emoji)
 	},
 
-	generateMessage(role)
+	generateMessage(role, description = null)
 	{
+		let finalDescription = EmbedDescription
+
+		if(description)
+			finalDescription += '\n\n' + description
+
 		return new EmbedBuilder()
 			.setTitle(role.name)
 			.setColor(role.color)
-			.setDescription(EmbedDescription)
+			.setDescription(finalDescription)
 	},
 
 	onReaction(reaction, user, added)
 	{
 		reaction.message.embeds.forEach(async embed => {
 			// Ignore embeds that don't match our description
-			if(embed.description != EmbedDescription) return
+			if(!embed.description.startsWith(EmbedDescription)) return
 
 			// Don't register author's reaction
 			if(user.id == reaction.message.author.id) return
